@@ -1,6 +1,11 @@
 Flutter Mobile Security Toolkit Library Changelog
 ===========================
 
+# 1.0.2
+* improved hooks detection in dart
+* switched to using pigeon for generating method channel api
+* dependency update
+
 # 1.0.1
 
 * Updated to respective 1.0.1 version of both Android and iOS libraries

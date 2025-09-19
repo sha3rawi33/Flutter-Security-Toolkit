@@ -1,3 +1,5 @@
+import 'package:pigeon/pigeon.dart';
+
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/src/threat_center_api.g.dart',
   dartOptions: DartOptions(),

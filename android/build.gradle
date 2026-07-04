@@ -51,27 +51,22 @@ android {
 
     defaultConfig {
         minSdk = 28
-        // Run this library's release classes (and the bundled EXXETA toolkit
-        // classes) through R8 so we can REPACKAGE them out of the root package
-        // 'a'. The prebuilt com.github.EXXETA:Android-Security-Toolkit:1.0.1 ships
-        // obfuscated helper classes as a/a, a/b, ... which collide at the app's
-        // R8 step with flutter_inappwebview_android (also a/a) ->
-        // "Type a.a is defined multiple times". Repackaging them under a unique
-        // namespace here removes the collision. See proguard-rules.pro.
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles "proguard-rules.pro"
-        }
     }
 
     dependencies {
-        // 'api' (not 'implementation') + minify => the EXXETA classes are pulled
-        // into this library's own processing scope so R8 can repackage them.
-        api("com.github.EXXETA:Android-Security-Toolkit:1.0.1")
+        // EXXETA Android-Security-Toolkit, consumed as a RELOCATED jar.
+        // -------------------------------------------------------------------
+        // The upstream com.github.EXXETA:Android-Security-Toolkit:1.0.1 jar ships
+        // four obfuscated helper classes in the ROOT package 'a' (a/a..a/d).
+        // flutter_inappwebview_android also puts classes in 'a', so the consuming
+        // app's R8 fails with: "Type a.a is defined multiple times".
+        // We ship a pre-relocated jar (libs/security-toolkit-relocated.jar) whose
+        // 'a' package was rewritten to com.exxeta.securitytoolkit.internal (every
+        // bytecode reference updated via ASM). The public
+        // com.exxeta.securitytoolkit.* API (ThreatDetectionCenter, ...) is
+        // unchanged, so the plugin behaves identically — this is purely a
+        // packaging fix for the R8 clash. See libs/README for how it was produced.
+        implementation files("libs/security-toolkit-relocated.jar")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")

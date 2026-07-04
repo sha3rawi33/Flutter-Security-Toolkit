@@ -51,10 +51,27 @@ android {
 
     defaultConfig {
         minSdk = 28
+        // Run this library's release classes (and the bundled EXXETA toolkit
+        // classes) through R8 so we can REPACKAGE them out of the root package
+        // 'a'. The prebuilt com.github.EXXETA:Android-Security-Toolkit:1.0.1 ships
+        // obfuscated helper classes as a/a, a/b, ... which collide at the app's
+        // R8 step with flutter_inappwebview_android (also a/a) ->
+        // "Type a.a is defined multiple times". Repackaging them under a unique
+        // namespace here removes the collision. See proguard-rules.pro.
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles "proguard-rules.pro"
+        }
     }
 
     dependencies {
-        implementation("com.github.EXXETA:Android-Security-Toolkit:1.0.1")
+        // 'api' (not 'implementation') + minify => the EXXETA classes are pulled
+        // into this library's own processing scope so R8 can repackage them.
+        api("com.github.EXXETA:Android-Security-Toolkit:1.0.1")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")
